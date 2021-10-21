@@ -4,13 +4,14 @@ import time
 
 def main():
     s = SerialCommunication('COM9', 115200)
+    print("Starting communication thread...")
     s.start()
 
     # e is the exit flag
     e = False
     while not e:
         print(s.poll())
-        time.sleep(2)
+        time.sleep(1)
 
     s.join()
 

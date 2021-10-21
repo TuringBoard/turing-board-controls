@@ -1,10 +1,10 @@
-# This file contains all API's required for communication between different modules of the Skateboard
-# Each API needs to be non-blocking and would be called in a separate worker thread to send and receive data
-# A receive and transmit queue will be used to make sure no data is being lost
+
 '''
     Packet Structure: <Address><Data><Checksum>
 '''
+
 import threading
+import queue
 import serial
 from enum import Enum
 
@@ -24,7 +24,7 @@ class SerialCommunication(threading.Thread):
         threading.Thread.__init__(self)
 
         # Buffer for receiving data
-        self.rx_buffer = []
+        self.rx_buffer = queue.Queue(255)
         self.rx_lock = threading.Lock()
 
         # Serial Communication intialization
@@ -39,19 +39,20 @@ class SerialCommunication(threading.Thread):
             self.s.close()
 
     def run(self):
-        while True:
-            self.receive()
+        self.receive()
 
     def receive(self):
-        self.rx_lock.acquire()
-        self.rx_buffer.append(self.s.read(255))
-        self.rx_lock.release()
+        while True:
+            rx_data = self.s.read(255)
+            self.rx_lock.acquire()
+            self.rx_buffer.put(rx_data)
+            self.rx_lock.release()
 
     def poll(self):
         data = None
         self.rx_lock.acquire()
-        if len(self.rx_buffer) > 0:
-            data = self.rx_buffer.pop(0)
+        if not self.rx_buffer.empty():
+            data = self.rx_buffer.get()
         self.rx_lock.release()
         return data
 
