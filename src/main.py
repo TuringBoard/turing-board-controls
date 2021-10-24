@@ -1,9 +1,9 @@
-from src.Communication.communicate import SerialCommunication
+from src.Communication.communicate import ReceiveThread
 import time
 
 
 def main():
-    s = SerialCommunication('COM9', 115200)
+    s = ReceiveThread('COM9', 115200)
     print("Starting communication thread...")
     s.start()
 
@@ -12,6 +12,9 @@ def main():
     while not e:
         print(s.poll())
         time.sleep(1)
+
+        s.push(b'r')
+        s.send()
 
     s.join()
 
