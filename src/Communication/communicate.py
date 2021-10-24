@@ -6,6 +6,7 @@ import threading
 import queue
 import serial
 
+
 # This packet structure will be used for all communication of the Skateboard.
 class Packet:
     def __init__(self):
@@ -15,7 +16,7 @@ class Packet:
         pass
 
 
-class ReceiveThread(threading.Thread):
+class SerialCommunication(threading.Thread):
     def __init__(self, port, baudrate, timeout=1):
         # The threading constructor needs to be overridden
         threading.Thread.__init__(self)
@@ -23,8 +24,9 @@ class ReceiveThread(threading.Thread):
         # The architecture uses an RX and TX buffer for data transmission
         # Buffer for receiving data
         # Buffer for sending data
-        self.rx_buffer = queue.Queue(255)
-        self.tx_buffer = queue.Queue(255)
+        self.rx_buffer = queue.Queue(1024)
+        self.tx_buffer = queue.Queue(1024)
+        # Single lock required as the UART is half-duplex
         self.transmit_lock = threading.Lock()
 
         # Serial Communication intialization
@@ -43,7 +45,7 @@ class ReceiveThread(threading.Thread):
 
     def receive(self):
         while True:
-            rx_data = self.s.read(255)
+            rx_data = self.s.read(2)
             self.transmit_lock.acquire()
             self.rx_buffer.put(rx_data)
             self.transmit_lock.release()
