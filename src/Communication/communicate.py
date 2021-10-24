@@ -24,8 +24,8 @@ class SerialCommunication(threading.Thread):
         # The architecture uses an RX and TX buffer for data transmission
         # Buffer for receiving data
         # Buffer for sending data
-        self.rx_buffer = queue.Queue(1024)
-        self.tx_buffer = queue.Queue(1024)
+        self.rx_buffer = queue.Queue(255)
+        self.tx_buffer = queue.Queue(255)
         # Single lock required as the UART is half-duplex
         self.transmit_lock = threading.Lock()
 
@@ -47,7 +47,8 @@ class SerialCommunication(threading.Thread):
         while True:
             rx_data = self.s.read(2)
             self.transmit_lock.acquire()
-            self.rx_buffer.put(rx_data)
+            if not self.rx_buffer.full():
+                self.rx_buffer.put(rx_data)
             self.transmit_lock.release()
 
     # Used to check if the receive buffer has any data or not

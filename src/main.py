@@ -5,11 +5,11 @@ import time
 
 def main():
     s = SerialCommunication('COM9', 115200)
-    print("Starting communication thread...")
+    print("Initiating UART thread...")
     s.start()
 
-    remote_control = RemoteControl()
-    print("Starting remote control thread...")
+    remote_control = RemoteControl('127.0.0.1', 1100)
+    print("Initiating Remote Control thread...")
     remote_control.start()
 
     # e is the exit flag
@@ -22,8 +22,6 @@ def main():
             print(f"Input = {command}")
             s.push(command)
             s.send()
-
-        time.sleep(1)
 
     s.join()
     remote_control.join()
