@@ -8,13 +8,9 @@ remote_control_port = 1100
 
 # IPv4, TCP Stream Socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((ip, remote_control_port))
-s.listen()
-print("Waiting to receive a connection...")
-conn, address = s.accept()
-print(f'Received connection from {address}')
+s.connect((ip, remote_control_port))
 
 while True:
     print('Turing Board> ', end="")
     user_input = input()
-    conn.sendall(bytes(user_input, 'ascii'))
+    s.sendall(bytes(user_input, 'ascii'))

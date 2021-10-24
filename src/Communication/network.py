@@ -16,21 +16,30 @@ class RemoteControl(threading.Thread):
         self.q = queue.Queue(255)
         self.lock = threading.Lock()
 
-        # IPv4, TCP Stream Socket
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(f'Trying to establish connection to {ip}:{port}')
-        self.s.connect((ip, port))
-        print(f'Connected to {ip}:{port}')
+        self.s = None
+        self.ip = ip
+        self.port = port
+        self.remote_control = None
 
     def __del__(self):
         self.s.close()
 
     def run(self):
+        self.initalize_server()
         while True:
             self.command()
 
+    def initalize_server(self):
+        # IPv4, TCP Stream Socket
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.s.bind((self.ip, self.port))
+        self.s.listen()
+        print('Listening for incoming connection from remote...')
+        self.remote_control, address = self.s.accept()
+        print(f'Connected to {address}')
+
     def command(self):
-        data = self.s.recv(255)
+        data = self.remote_control.recv(255)
         self.lock.acquire()
         if not self.q.full():
             self.q.put(data)
