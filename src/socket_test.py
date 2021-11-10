@@ -1,5 +1,5 @@
 # This program will be used to test the P2P connection between the remote control and long board
-
+'''
 import socket
 
 
@@ -14,3 +14,26 @@ while True:
     print('Turing Board> ', end="")
     user_input = input()
     s.sendall(bytes(user_input, 'ascii'))
+'''
+
+import pyrebase
+
+firebaseConfig = {
+    "apiKey": "AIzaSyDNS6tW71-jOsGKOGrh6V5dQWTfZSS6tCI",
+    "databaseURL": "https://turing-board-default-rtdb.firebaseio.com/",
+    "authDomain": "turing-board.firebaseapp.com",
+    "projectId": "turing-board",
+    "storageBucket": "turing-board.appspot.com",
+    "messagingSenderId": "1008426809841",
+    "appId": "1:1008426809841:web:0e490af3b6046f64aeec50"
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+db = firebase.database()
+
+
+def stream_handler(message):
+    print(message["data"])
+
+
+db.child("users/VR8SIRfZHNdo9mTTMENnf1tZQd52").stream(stream_handler)
