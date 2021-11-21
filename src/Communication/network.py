@@ -26,7 +26,7 @@ firebaseConfig = {
 }
 
 
-
+'''
 class RemoteControl(threading.Thread):
     def __init__(self, ip, port):
         threading.Thread.__init__(self)
@@ -45,16 +45,10 @@ class RemoteControl(threading.Thread):
 
     def run(self):
         self.initalize_server()
-        '''
-        self.initalize_server()
-        while True:
-            self.command()
-        '''
         while True:
             pass
 
     def initalize_server(self):
-        '''
         # IPv4, TCP Stream Socket
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.bind((self.ip, self.port))
@@ -62,10 +56,6 @@ class RemoteControl(threading.Thread):
         print('Listening for incoming connection from remote...')
         self.remote_control, address = self.s.accept()
         print(f'Connected to {address}')
-        '''
-        firebase = pyrebase.initialize_app(firebaseConfig)
-        db = firebase.database()
-        db.child("users/VR8SIRfZHNdo9mTTMENnf1tZQd52").stream(self.command)
 
     def command(self, message):
         # data = self.remote_control.recv(255)
@@ -74,6 +64,38 @@ class RemoteControl(threading.Thread):
         if not self.q.full():
             self.q.put(message["data"]['speed'])
         self.lock.release()
+
+    def poll(self):
+        data = None
+        self.lock.acquire()
+        if not self.q.empty():
+            data = self.q.get()
+        self.lock.release()
+        return data
+'''
+
+
+class RemoteControl:
+    def __init__(self):
+
+        # Used to store incoming data packets
+        self.q = queue.Queue(255)
+        self.lock = threading.Lock()
+
+        self.firebase = pyrebase.initialize_app(firebaseConfig)
+        self.db = self.firebase.database()
+
+    def __del__(self):
+        pass
+
+    def command(self, message):
+        self.lock.acquire()
+        if not self.q.full():
+            self.q.put(message["data"]['speed'])
+        self.lock.release()
+
+    def initialize_network(self):
+        self.db.child("users/VR8SIRfZHNdo9mTTMENnf1tZQd52").stream(self.command)
 
     def poll(self):
         data = None

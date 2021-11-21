@@ -36,4 +36,4 @@ def stream_handler(message):
     print(message["data"])
 
 
-db.child("users/VR8SIRfZHNdo9mTTMENnf1tZQd52").stream(stream_handler)
+db.child("users/gXcA4yBykAS05reLm4guWoIn8D12").stream(stream_handler)
