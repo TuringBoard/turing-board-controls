@@ -41,7 +41,6 @@ class Controls:
         # Mutex lock required as duty_cycle is being modified inside of two threads
         self.speed_control_mutex = Lock()
         self.max_speed = 5.00
-
         self.motor = None
 
     # The destructor for the VESC call seems to be called automatically.
@@ -50,9 +49,6 @@ class Controls:
     def __del__(self):
         if self.motor:
             del self.motor
-        
-        if self.remote_control_handler:
-            self.remote_control_handler.close()
 
     def initialize(self):
         print(f'Initializing Turning Board Controls ...\nUsing {self.serial_port_name}')
@@ -80,6 +76,11 @@ class Controls:
             self.duty_cycle = round(change_range(speed['data']['speed'], 0.00, self.max_speed, 0.00, 0.99), 2)
             self.speed_control_mutex.release()
 
+    # The diamter of the wheel = 3.5 in
+    # Convert it to meter first and then divide by 2
+    def __get_velocity(self, rpm):
+        return round(((72 * 3.1415 * (0.0889/2)) / 965.6064)  * rpm, 2)
+
     def run(self):
         try:
             while self.is_runnig:
@@ -90,18 +91,20 @@ class Controls:
                 else:
                     # Call CV follow-me code here
                     pass
-                print(f"RPM: {self.motor.get_rpm():8}\r", end="")
+                print(f"RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
             print('Exiting ...')
             self.is_runnig = False
             self.motor.set_duty_cycle(0)
+            if self.remote_control_handler:
+                self.remote_control_handler.close()
 
 
 def main():
     # initialize_controls()
     # run_wheels()
     # The maximum number of arguments required is 2
-    # @Keaton, @Happy, this is a ternary operator
+    # @Keaton, @Happy, this is a ternary operator. Mentioning it because the syntax might be new
     turning_board = Controls(sys.argv[1]) if len(sys.argv) == 2 else Controls()
     turning_board.initialize()
     turning_board.run()
