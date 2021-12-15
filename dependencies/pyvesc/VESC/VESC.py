@@ -1,3 +1,10 @@
+'''
+    Modification by Runtime Terrors:
+    1) __del__ was added to the VESC class
+    2) A mutex was added to the VESC write member function bceause multiple threads might be
+       calling this function.
+'''
+
 from pyvesc.protocol.interface import encode_request, encode, decode
 from pyvesc.VESC.messages import *
 import time
@@ -31,7 +38,7 @@ class VESC(object):
 
         self.heart_beat_thread = threading.Thread(target=self._heartbeat_cmd_func)
         self._stop_heartbeat = threading.Event()
-        self.mutex = Lock()
+        self.write_mutex = Lock()
 
         if start_heartbeat:
             self.start_heartbeat()
@@ -95,9 +102,9 @@ class VESC(object):
         :return: decoded response from buffer
         Modification: A mutex has been added considering multiple threads are accessing the write function
         """
-        self.mutex.acquire()
+        self.write_mutex.acquire()
         self.serial_port.write(data)
-        self.mutex.release()
+        self.write_mutex.release()
         if num_read_bytes is not None:
             while self.serial_port.in_waiting <= num_read_bytes:
                 time.sleep(0.000001)  # add some delay just to help the CPU

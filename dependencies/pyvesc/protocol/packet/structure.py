@@ -1,7 +1,13 @@
+'''
+    Modification by Runtime Terrors:
+    1) PyCRC was replaced with the crccheck module
+'''
+
 import collections
 import struct
 from pyvesc.protocol.packet.exceptions import *
 from crccheck.crc import CrcXmodem
+
 
 crc_checker = CrcXmodem()
 

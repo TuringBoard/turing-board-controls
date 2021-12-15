@@ -1,3 +1,8 @@
+'''
+    Modification by Runtime Terrors:
+    1) PyCRC was replaced with the crccheck module
+'''
+
 from .exceptions import *
 from .structure import *
 from crccheck.crc import CrcXmodem
