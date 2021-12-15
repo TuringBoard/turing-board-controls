@@ -3,4 +3,5 @@ Software responsible for controlling the wheels and turning mechanism of the Tur
 
 ### Dependencies
 - `pip install crccheck`
+- `pip install Pyrebase`
 - PyVESC - A modified version of the library has been added inside of this project.

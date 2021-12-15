@@ -1,5 +1,5 @@
 '''
-    Packet Structure: <Address><Data><Checksum>
+    Author: Runtime Terrors
 '''
 
 import threading
