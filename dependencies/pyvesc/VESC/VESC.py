@@ -46,6 +46,14 @@ class VESC(object):
         self._get_values_msg = encode_request(msg)
         self._get_values_msg_expected_length = msg._full_msg_size
 
+    # This was added by Runtime Terrors.
+    # Releases all currently used resources
+    def __del__(self):
+        self.stop_heartbeat()
+        if self.serial_port.is_open:
+            self.serial_port.flush()
+            self.serial_port.close()
+
     def __enter__(self):
         return self
 
