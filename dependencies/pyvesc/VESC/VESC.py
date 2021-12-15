@@ -85,6 +85,7 @@ class VESC(object):
         :param data: the byte string to be sent
         :param num_read_bytes: number of bytes to read for decoding response
         :return: decoded response from buffer
+        Modification: A mutex has been added considering multiple threads are accessing the write function
         """
         self.mutex.acquire()
         self.serial_port.write(data)
@@ -139,8 +140,9 @@ class VESC(object):
     def get_duty_cycle(self):
         """
         :return: Current applied duty-cycle
+        Modification: Changed duty_now to duty_cycle_now
         """
-        return self.get_measurements().duty_now
+        return self.get_measurements().duty_cycle_now
 
     def get_v_in(self):
         """
@@ -151,8 +153,9 @@ class VESC(object):
     def get_motor_current(self):
         """
         :return: Current motor current
+        Modification: Changed curret_motor to avg_motor_current
         """
-        return self.get_measurements().current_motor
+        return self.get_measurements().avg_motor_current
 
     def get_incoming_current(self):
         """
