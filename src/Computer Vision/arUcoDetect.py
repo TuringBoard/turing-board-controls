@@ -1,5 +1,5 @@
 # Author: Sahaj Amatya
-
+'''
 import cv2
 import cv2.aruco as aruco
 import numpy as np
@@ -10,10 +10,12 @@ from realsense_depth import *
 
 
 '''
+'''
 [[ 14.   7.]
  [ 94.   7.]
  [100.  83.]
- [ 20.  84.]] 
+ [ 20.  84.]]
+'''
 '''
 
 
@@ -141,3 +143,4 @@ class FollowMe:
         if key == 27 or key == ord('q'):
             cv2.destroyAllWindows()
             break
+'''

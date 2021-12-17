@@ -19,7 +19,7 @@ sys.path.insert(0, '../Computer Vision')
 
 from pyvesc import VESC                         # Controls the ESC
 from communicate import SerialCommunication     # Establishes connection to the microcontroller
-from arUcoDetect import FollowMe                # Includes the code for the follow-me feature
+# from arUcoDetect import FollowMe                # Includes the code for the follow-me feature
 
 
 def change_range(i, input_start, input_end, output_start, output_end):
@@ -58,7 +58,7 @@ class Controls:
         print(f'Firmware: {self.motor.get_firmware_version()}')
 
         # Intialize Follow Me Feature
-        self.follow_me = FollowMe()
+        # self.follow_me = FollowMe()
 
         # Intialize connection to the database
         # Create the database connection for receiving the speed values
@@ -99,7 +99,8 @@ class Controls:
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
-                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.30, 500)
+                    # self.follow_me.follow_me(self.motor.set_duty_cycle, 0.30, 500)
+                    pass
                 print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
             print('Exiting ...')
