@@ -3,8 +3,7 @@
     Author: Runtime Terrors
 '''
 
-import sys, pyrebase
-from enum import IntEnum
+import sys, pyrebase, time
 from threading import Lock
 from config import *
 
@@ -15,11 +14,11 @@ from config import *
 '''
 sys.path.insert(0, '../../dependencies/')
 sys.path.insert(0, '../Communication')
-sys.path.insert(0, '../Computer Vision')
+sys.path.insert(0, '../../../turing-board-vision/arUcoTests')
 
 from pyvesc import VESC                         # Controls the ESC
-from communicate import SerialCommunication     # Establishes connection to the microcontroller
-# from arUcoDetect import FollowMe                # Includes the code for the follow-me feature
+# from communicate import SerialCommunication     # Establishes connection to the microcontroller
+from arUcoDetectClass import FollowMe
 
 
 def change_range(i, input_start, input_end, output_start, output_end):
@@ -27,11 +26,11 @@ def change_range(i, input_start, input_end, output_start, output_end):
 
 
 class Controls:
-    def __init__(self, serial_port_name='COM8'):
+    def __init__(self, serial_port_name='/dev/ttyACM0'):
         # Serial port that VESC is connected to. Something like "COM3" for windows or '/dev/tty' for Linux
         self.serial_port_name = serial_port_name
         self.is_running = False
-        self.autonomous_mode = False
+        self.autonomous_mode = True
         # This is a handle (Think of a literal handle) to the data stream
         # This will be used later to free up the resources used by the data stream
         self.remote_control_handler = None
@@ -55,10 +54,11 @@ class Controls:
         # Intialize VESC
         print(f'Initializing Turning Board Controls ...\nUsing {self.serial_port_name}')
         self.motor = VESC(serial_port=self.serial_port_name, has_sensor=True)
-        print(f'Firmware: {self.motor.get_firmware_version()}')
+        print('Initializing VESC...')
+        # print(f'Firmware: {self.motor.get_firmware_version()}')
 
         # Intialize Follow Me Feature
-        # self.follow_me = FollowMe()
+        self.follow_me = FollowMe()
 
         # Intialize connection to the database
         # Create the database connection for receiving the speed values
@@ -93,28 +93,30 @@ class Controls:
         try:
             # Main loop
             while self.is_running:
+                time.sleep(0.1)
                 if not self.autonomous_mode:
                     self.speed_control_mutex.acquire()
                     self.motor.set_duty_cycle(self.duty_cycle)
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
-                    # self.follow_me.follow_me(self.motor.set_duty_cycle, 0.30, 500)
+                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.30, 250)
                     pass
-                print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
+                # print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
             print('Exiting ...')
             self.is_running = False
             self.motor.set_duty_cycle(0)
             if self.remote_control_handler:
                 self.remote_control_handler.close()
+            self.follow_me.close_follow_me()
 
 
 def main():
     # The maximum number of arguments required is 2
     # @Keaton, @Happy, this is a ternary operator. Mentioning it because the syntax
     # might be something you've not seen before.
-    turning_board = Controls(sys.argv[1]) if len(sys.argv) == 2 else Controls()
+    turning_board = Controls()
     turning_board.initialize()
     turning_board.run()
 

@@ -33,6 +33,8 @@ class VESC(object):
             raise ImportError("Need to install pyserial in order to use the VESCMotor class.")
 
         self.serial_port = serial.Serial(port=serial_port, baudrate=baudrate, timeout=timeout)
+        self.serial_port.rtscts = False
+        self.serial_port.dsrdtr = False
         if has_sensor:
             self.serial_port.write(encode(SetRotorPositionMode(SetRotorPositionMode.DISP_POS_OFF)))
 
@@ -44,8 +46,8 @@ class VESC(object):
             self.start_heartbeat()
 
         # check firmware version and set GetValue fields to old values if pre version 3.xx
-        version = self.get_firmware_version()
-        if int(version.split('.')[0]) < 3:
+        # version = self.get_firmware_version()
+        # if int(version.split('.')[0]) < 3:
             GetValues.fields = pre_v3_33_fields
 
         # store message info for getting values so it doesn't need to calculate it every time
