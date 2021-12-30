@@ -131,7 +131,8 @@ class VESC(object):
         :param new_duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
         """
         self.write(encode(SetDutyCycle(new_duty_cycle)))
-
+        self.write(encode(SetDutyCycle(new_duty_cycle, can_id=100)))
+        
     def set_servo(self, new_servo_pos):
         """
         :param new_servo_pos: New servo position. valid range [0, 1]
