@@ -30,7 +30,7 @@ class Controls:
         # Serial port that VESC is connected to. Something like "COM3" for windows or '/dev/tty' for Linux
         self.serial_port_name = serial_port_name
         self.is_running = False
-        self.autonomous_mode = True
+        self.autonomous_mode = False
         # This is a handle (Think of a literal handle) to the data stream
         # This will be used later to free up the resources used by the data stream
         self.remote_control_handler = None
