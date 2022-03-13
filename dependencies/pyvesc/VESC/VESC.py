@@ -19,7 +19,7 @@ except ImportError:
 
 
 class VESC(object):
-    def __init__(self, serial_port, has_sensor=False, start_heartbeat=True, baudrate=115200, timeout=0.05):
+    def __init__(self, serial_port, has_sensor=False, start_heartbeat=True, baudrate=19200, timeout=0.05):
         """
         :param serial_port: Serial device to use for communication (i.e. "COM3" or "/dev/tty.usbmodem0")
         :param has_sensor: Whether or not the bldc motor is using a hall effect sensor
@@ -129,6 +129,7 @@ class VESC(object):
         :param new_duty_cycle: Value of duty cycle to be set (range [-1e5, 1e5]).
         """
         self.write(encode(SetDutyCycle(new_duty_cycle)))
+        self.write(encode(SetDutyCycle(new_duty_cycle, can_id=100)))
 
     def set_servo(self, new_servo_pos):
         """

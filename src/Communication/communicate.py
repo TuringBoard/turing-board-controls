@@ -35,7 +35,7 @@ class SerialCommunication(threading.Thread):
         self.s.baudrate = baudrate
         self.s.timeout = timeout
         self.s.open()
-    
+
     def __del__(self):
         if self.s.is_open():
             self.s.close()

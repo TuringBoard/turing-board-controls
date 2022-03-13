@@ -43,6 +43,7 @@ class Controls:
         # Controls modules
         self.motor = None
         self.follow_me = None
+        self.red_board = None
 
     # The destructor for the VESC call seems to be called automatically.
     # Leave this here as a contengency.
@@ -67,10 +68,13 @@ class Controls:
         self.remote_control_handler = db.child(current_user).stream(self.__stream_handler)
         self.is_running = True
 
+        # Establish connection to the red board
+        self.red_board = SerialCommunication('COM9', 115200)
+
     # The diamter of the wheel = 3.5 in
     # Convert it to meter first and then divide by 2
     def __get_velocity(self, rpm):
-        return round(((72 * 3.1415 * (0.0889/2)) / 965.6064)  * rpm, 2)
+        return round(((72 * 3.1415 * (0.0889/2)) / 965.6064) * rpm, 2)
 
     # This private callback function is responsible for receiving data from the real-time database and processing it.
     # My best guess is that this function is run on a separate thread of execution.
@@ -86,8 +90,10 @@ class Controls:
             # The Duty Cycle that the ESC accepts ranges from 0 to 1
             # The mapping should be from the lower speed to the upper speed value which should be dynamic
             self.duty_cycle = round(change_range(speed['data']['speed'], 0.00, self.max_speed, 0.00, 0.99), 2)
-            self.speed_control_mutex.release()
 
+            # self.turn_angle = ();
+
+            self.speed_control_mutex.release()
 
     def run(self):
         try:
@@ -97,11 +103,23 @@ class Controls:
                     self.speed_control_mutex.acquire()
                     self.motor.set_duty_cycle(self.duty_cycle)
                     self.speed_control_mutex.release()
+
                 else:
                     # Call CV follow-me code here
                     # self.follow_me.follow_me(self.motor.set_duty_cycle, 0.30, 500)
                     pass
                 print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
+
+                # Example code
+                # Id = 0xAA
+                # Direction = 0x00 [Straight]
+                # Angle = 0x00
+                turning_mechanism_data = [0xAA, 0x00, 0x00]
+                turning_mechanism_data = bytearray(turning_mechanism_data)
+                if self.duty_cycle > 0.7:
+                    self.red_board.push(turning_mechanism_data)
+                    self.red_board.send()
+
         except KeyboardInterrupt:
             print('Exiting ...')
             self.is_running = False
