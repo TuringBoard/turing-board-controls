@@ -46,13 +46,15 @@ print("before Loop")
 #   received = turningMechanism.poll()
 #   print(received)
 angle = Slider(axis, 'Angle', 0, 90, 45)
+prevAngle = 45
 def update(val):
+  global prevAngle
   a = int(angle.val)
   angle1 = a
   data.append(1 & 0xFF)  
   data.append(int(angle1) & 0xFF)
   direction = 0
-  if angle1 > 45:
+  if angle1 > prevAngle:
     direction = 1
   data.append(int(direction) & 0xFF)
   rate = 0
@@ -62,6 +64,7 @@ def update(val):
   print("bytearray:", toSend)
   turningMechanism.push(toSend)
   turningMechanism.send()
+  prevAngle = angle1
   del data[:]
 
 angle.on_changed(update)
