@@ -28,7 +28,8 @@ data = []
 print("before SerialCommunication init")
 # usbmodem0E23569D1
 # usbmodem0E22E54A1
-turningMechanism = SerialCommunication("/dev/ttyACM0", 115200)
+# usbmodem0E228C441
+turningMechanism = SerialCommunication("/dev/cu.usbmodem0E228C441", 115200)
 print("before run")
 # turningMechanism.run()
 
@@ -45,14 +46,18 @@ print("before Loop")
 #   turningMechanism.receive()
 #   received = turningMechanism.poll()
 #   print(received)
-angle = Slider(axis, 'Angle', 0, 90, 45)
+previous = 45
+angle = Slider(axis, 'Angle', 0, 100, 50)
+buttonAxis = plt.axes([0.81, 0.05, 0.1, 0.075])
+homeBtn = Button(buttonAxis,'Home')
 def update(val):
+  global previous
   a = int(angle.val)
   angle1 = a
   data.append(1 & 0xFF)  
   data.append(int(angle1) & 0xFF)
   direction = 0
-  if angle1 > 45:
+  if angle1 > previous:
     direction = 1
   data.append(int(direction) & 0xFF)
   rate = 0
@@ -62,10 +67,30 @@ def update(val):
   print("bytearray:", toSend)
   turningMechanism.push(toSend)
   turningMechanism.send()
+  previous = angle1
   del data[:]
 
+def goHome(e):
+  global previous
+  a = 50
+  angle1 = a
+  data.append(1 & 0xFF)  
+  data.append(int(angle1) & 0xFF)
+  direction = 2
+  data.append(int(direction) & 0xFF)
+  rate = 0
+  data.append(int(rate) & 0xFF)
+  print("data:",data)
+  toSend = bytearray(data)
+  print("bytearray:", toSend)
+  turningMechanism.push(toSend)
+  turningMechanism.send()
+  previous = angle1
+  del data[:]
+  
 angle.on_changed(update)
 
+homeBtn.on_clicked(goHome)
   
     
 plt.show()
