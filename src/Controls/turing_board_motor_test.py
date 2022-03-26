@@ -30,7 +30,7 @@ class Controls:
         # Serial port that VESC is connected to. Something like "COM3" for windows or '/dev/tty' for Linux
         self.serial_port_name = serial_port_name
         self.is_running = False
-        self.autonomous_mode = False
+        self.autonomous_mode = True
         # This is a handle (Think of a literal handle) to the data stream
         # This will be used later to free up the resources used by the data stream
         self.remote_control_handler = None
@@ -100,7 +100,7 @@ class Controls:
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
-                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.02, 250)
+                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.02, 300)
                     pass
                 # print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
