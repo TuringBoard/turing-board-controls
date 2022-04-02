@@ -3,6 +3,7 @@
     Author: Runtime Terrors
 '''
 
+from asyncio import sleep
 import sys, pyrebase, time
 from threading import Lock
 from config import *
@@ -16,6 +17,9 @@ sys.path.insert(0, '../../dependencies/')
 sys.path.insert(0, '../Communication')
 sys.path.insert(0, '../../../turing-board-vision/arUcoTests')
 
+
+
+
 from pyvesc import VESC                         # Controls the ESC
 # from communicate import SerialCommunication     # Establishes connection to the microcontroller
 from arUcoDetectClass import FollowMe
@@ -26,11 +30,12 @@ def change_range(i, input_start, input_end, output_start, output_end):
 
 
 class Controls:
-    def __init__(self, serial_port_name='/dev/ttyACM0'):
+    def __init__(self, vesc_serial_port='/dev/ttyACM0', follow_me_serial_port='/dev/ttyACM1'):
         # Serial port that VESC is connected to. Something like "COM3" for windows or '/dev/tty' for Linux
-        self.serial_port_name = serial_port_name
+        self.vesc_serial_port = vesc_serial_port
+        self.follow_me_serial_port = follow_me_serial_port
         self.is_running = False
-        self.autonomous_mode = True
+        self.autonomous_mode = False
         # This is a handle (Think of a literal handle) to the data stream
         # This will be used later to free up the resources used by the data stream
         self.remote_control_handler = None
@@ -52,19 +57,18 @@ class Controls:
 
     def initialize(self):
         # Intialize VESC
-        print(f'Initializing Turning Board Controls ...\nUsing {self.serial_port_name}')
-        self.motor = VESC(serial_port=self.serial_port_name, has_sensor=True)
+        print(f'Initializing Turning Board Controls ...\nUsing {self.vesc_serial_port}')
+        self.motor = VESC(serial_port=self.vesc_serial_port, has_sensor=True)
         print('Initializing VESC...')
         # print(f'Firmware: {self.motor.get_firmware_version()}')
-
         # Intialize Follow Me Feature
-        self.follow_me = FollowMe()
+        self.follow_me = FollowMe(self.follow_me_serial_port)
 
         # Intialize connection to the database
         # Create the database connection for receiving the speed values
-        firebase = pyrebase.initialize_app(firebaseConfig)
-        db = firebase.database()
-        self.remote_control_handler = db.child(current_user).stream(self.__stream_handler)
+        # firebase = pyrebase.initialize_app(firebaseConfig)
+        # db = firebase.database()
+        # self.remote_control_handler = db.child(current_user).stream(self.__stream_handler)
         self.is_running = True
 
     # The diamter of the wheel = 3.5 in
@@ -88,27 +92,25 @@ class Controls:
             self.duty_cycle = round(change_range(speed['data']['speed'], 0.00, self.max_speed, 0.00, 0.99), 2)
             self.speed_control_mutex.release()
 
-
     def run(self):
         try:
             # Main loop
             while self.is_running:
                 # time.sleep(0.1)
-                if not self.autonomous_mode:
+                if self.autonomous_mode == True:
                     self.speed_control_mutex.acquire()
                     self.motor.set_duty_cycle(self.duty_cycle)
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
-                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.02, 300)
-                    pass
+                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.01, 300)
                 # print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
             print('Exiting ...')
             self.is_running = False
-            self.motor.set_duty_cycle(0)
-            if self.remote_control_handler:
-                self.remote_control_handler.close()
+            # self.motor.set_duty_cycle(0)
+            # if self.remote_control_handler:
+                # self.remote_control_handler.close()
             self.follow_me.close_follow_me()
 
 
@@ -119,7 +121,6 @@ def main():
     turning_board = Controls()
     turning_board.initialize()
     turning_board.run()
-
 
 if __name__ == '__main__':
     main()
