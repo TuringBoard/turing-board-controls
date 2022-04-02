@@ -30,7 +30,7 @@ def change_range(i, input_start, input_end, output_start, output_end):
 
 
 class Controls:
-    def __init__(self, vesc_serial_port='/dev/ttyACM0', follow_me_serial_port='/dev/ttyACM1'):
+    def __init__(self, vesc_serial_port='/dev/ttyACM1', follow_me_serial_port='/dev/ttyACM0'):
         # Serial port that VESC is connected to. Something like "COM3" for windows or '/dev/tty' for Linux
         self.vesc_serial_port = vesc_serial_port
         self.follow_me_serial_port = follow_me_serial_port
