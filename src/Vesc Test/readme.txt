@@ -1,0 +1,1 @@
+This directory contains test code which was used on my part to learn more about how the vesc library functions.
