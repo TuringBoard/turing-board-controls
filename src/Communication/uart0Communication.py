@@ -10,7 +10,8 @@ axis = plt.axes([0.20, 0.4, 0.65, 0.13])
  
 
   
-
+def printName(name):
+  print(name)
  
 
 
@@ -24,54 +25,104 @@ class RedBoardDataStructure:
     data = []
 
 # X = 1,2, ...
-data = []
-print("before SerialCommunication init")
+# data = []
+# print("before SerialCommunication init")
 # usbmodem0E23569D1
 # usbmodem0E22E54A1
-turningMechanism = SerialCommunication("/dev/ttyACM0", 115200)
-print("before run")
+# usbmodem0E228C441
+turningMechanism = SerialCommunication(port="/dev/ttyACM1", baudrate=115200)
+# print("before run")
 # turningMechanism.run()
 
-print("before RedBoard init")
+# print("before RedBoard init")
 # dataToSend = RedBoardDataStructure()
 # dataToSend.led = [66, 67, 68]
 # dataToSend.turningMechanism = [69, 70]
 # dataToSend.solenoid = 71
 
 # This is the while loop inside the main controls code
-print(data)
-print("before Loop")
+# print(data)
+# print("before Loop")
 # while True:
 #   turningMechanism.receive()
 #   received = turningMechanism.poll()
 #   print(received)
-angle = Slider(axis, 'Angle', 0, 90, 45)
-prevAngle = 45
-def update(val):
-  global prevAngle
-  a = int(angle.val)
-  angle1 = a
-  data.append(1 & 0xFF)  
-  data.append(int(angle1) & 0xFF)
-  direction = 0
-  if angle1 > prevAngle:
-    direction = 1
-  data.append(int(direction) & 0xFF)
-  rate = 0
-  data.append(int(rate) & 0xFF)
-  print("data:",data)
-  toSend = bytearray(data)
-  print("bytearray:", toSend)
-  turningMechanism.push(toSend)
-  turningMechanism.send()
-  prevAngle = angle1
-  del data[:]
+previous = 50
+angle = Slider(axis, 'Angle', 0, 100, 50)
+buttonAxis = plt.axes([0.81, 0.05, 0.1, 0.075])
+homeBtn = Button(buttonAxis,'Home')
 
-angle.on_changed(update)
+# def update(val):
+#   global previous
+#   a = int(angle.val)
+#   angle1 = a
+#   data.append(1 & 0xFF)  
+#   data.append(int(angle1) & 0xFF)
+#   direction = 0
+#   if angle1 > previous:
+#     direction = 1
+#   data.append(int(direction) & 0xFF)
+#   rate = 0
+#   data.append(int(rate) & 0xFF)
+#   print("data:",data)
+#   toSend = bytearray(data)
+#   print("bytearray:", toSend)
+#   turningMechanism.push(toSend)
+#   turningMechanism.send()
+#   previous = angle1
+#   del data[:]
 
+# def goHome(e):
+#   global previous
+#   a = 50
+#   angle1 = a
+#   data.append(1 & 0xFF)  
+#   data.append(int(angle1) & 0xFF)
+#   direction = 2
+#   data.append(int(direction) & 0xFF)
+#   rate = 0
+#   data.append(int(rate) & 0xFF)
+#   print("data:",data)
+#   toSend = bytearray(data)
+#   print("bytearray:", toSend)
+#   turningMechanism.push(toSend)
+#   turningMechanism.send()
+#   previous = angle1
+# #   del data[:]
   
+# def updateAngle(angle1): 
+#   print("update command sent", angle1)
+#   global previous
+#   data = []
+#   data.append(1 & 0xFF)  
+#   data.append(int(angle1) & 0xFF)
+#   direction = 0
+#   if angle1 > previous:
+#     direction = 1
+#   data.append(int(direction) & 0xFF)
+#   rate = 0
+#   data.append(int(rate) & 0xFF)
+#   print("data:",data)
+#   toSend = bytearray(data)
+#   print("bytearray:", toSend)
+#   turningMechanism.push(toSend)
+#   print("b4", toSend)
+#   turningMechanism.send()
+#   print("after")
+#   previous = angle1
+
+# angle.on_changed(update)
+
+# homeBtn.on_clicked(goHome)
+
+# def helperFn(angle2):
+  # updateAngle(int(angle2))
+
+# while True: 
+#   angle2 = int(input("Enter angle: "))
+#   updateAngle(angle2)
     
-plt.show()
+# plt.show()
 
 # while True:
   
@@ -106,4 +157,3 @@ plt.show()
 #   # print(received[1])
 #   # del received[:]
 #   del data[:]
-
