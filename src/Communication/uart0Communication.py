@@ -30,7 +30,7 @@ class RedBoardDataStructure:
 # usbmodem0E23569D1
 # usbmodem0E22E54A1
 # usbmodem0E228C441
-turningMechanism = SerialCommunication(port="/dev/ttyACM1", baudrate=115200)
+turningMechanism = SerialCommunication(port="/dev/ttyACM0", baudrate=115200)
 # print("before run")
 # turningMechanism.run()
 
@@ -126,13 +126,20 @@ homeBtn = Button(buttonAxis,'Home')
 
 # while True:
   
-#   # turningMechanism.receive()
-#   # received = bytearray(turningMechanism.poll())
-#   # print("received data")
-#   # print(received)
-#   # Receive input here
-#   print("Enter ID: ")
-#   id = input()
+  # turningMechanism.receive()
+  # received = bytearray(turningMechanism.poll())
+  # print("received data")
+  # print(received)
+  # Receive input here
+  # id = 2
+  # mode = int(input("Enter mode: "))
+  # data = []
+  # data.append(id & 0xFF)
+  # data.append(mode & 0XFF)
+  # turningMechanism.push(data)
+  # turningMechanism.send()
+  # del data[:]
+  
   
 #     # Convert dataToSend to an array of uint8_t's
   
