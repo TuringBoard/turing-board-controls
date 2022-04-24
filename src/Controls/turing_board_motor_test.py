@@ -3,6 +3,7 @@
     Author: Runtime Terrors
 '''
 
+import atexit
 from asyncio import sleep
 import sys, pyrebase, time
 from threading import Lock
@@ -50,6 +51,7 @@ class Controls:
         # Controls modules
         self.motor = None
         self.follow_me = None
+        self.prevMode = 3
 
     # The destructor for the VESC call seems to be called automatically.
     # Leave this here as a contengency.
@@ -118,7 +120,7 @@ class Controls:
             # Main loop
             while self.is_running:
                 # time.sleep(0.1)
-                if self.autonomous_mode == True:
+                if self.autonomous_mode == False:
                     self.speed_control_mutex.acquire()
                     self.motor.set_duty_cycle(self.duty_cycle)
                     self.speed_control_mutex.release()
@@ -129,9 +131,9 @@ class Controls:
         except KeyboardInterrupt:
             print('Exiting ...')
             self.is_running = False
-            # self.motor.set_duty_cycle(0)
-            # if self.remote_control_handler:
-                # self.remote_control_handler.close()
+            self.motor.set_duty_cycle(0)
+            if self.remote_control_handler:
+                self.remote_control_handler.close()
             self.follow_me.close_follow_me()
 
 
@@ -142,6 +144,8 @@ def main():
     turning_board = Controls()
     turning_board.initialize()
     turning_board.run()
+    atexit.register(turning_board.updateMode(3))
 
 if __name__ == '__main__':
     main()
+
