@@ -103,16 +103,18 @@ class Controls:
     # blue 1
     # green 2
     def updateMode(self, mode):
-        data = []
-        data.append(2 & 0xFF)
-        data.append(mode & 0xFF)
         if mode != self.prevMode:
-            toSend = bytearray(data)
-            self.turningMechanism.push(toSend)
+            ledID = 2 & 0xFF
+            ledMode = mode & 0xFF
+            LEDData = [ledID, ledMode]
+            LEDPacket = bytearray(LEDData)
+            self.turningMechanism.push(LEDPacket)
             self.turningMechanism.send()
-            print("Data being sent to REDBOARD: ",toSend)
-            print("prevMode: ", self.prevMode)
-            print("currMode:", mode)
+            print("This is the mode: ", mode)
+            if mode == 2:
+                self.follow_me.updateAngle(50, 0)
+            else:
+                self.follow_me.updateAngle(50, 1)
         self.prevMode = mode
 
     def run(self):
