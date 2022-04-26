@@ -110,7 +110,6 @@ class Controls:
             LEDPacket = bytearray(LEDData)
             self.turningMechanism.push(LEDPacket)
             self.turningMechanism.send()
-            print("This is the mode: ", mode)
             if mode == 2:
                 self.updateLockState(0)            
             else:
@@ -134,7 +133,7 @@ class Controls:
                 # time.sleep(0.1)
                 if self.autonomous_mode == False:
                     self.speed_control_mutex.acquire()
-                    self.motor.set_duty_cycle(self.duty_cycle)
+                    self.motor.set_duty_cycle(-self.duty_cycle)
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
