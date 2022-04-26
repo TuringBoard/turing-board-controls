@@ -4,7 +4,7 @@
 '''
 
 import atexit
-from asyncio import sleep
+from asyncio import locks, sleep
 import sys, pyrebase, time
 from threading import Lock
 from config import *
@@ -112,10 +112,20 @@ class Controls:
             self.turningMechanism.send()
             print("This is the mode: ", mode)
             if mode == 2:
-                self.follow_me.updateAngle(50, 0)
+                self.updateLockState(0)            
             else:
-                self.follow_me.updateAngle(50, 1)
+                self.updateLockState(1)
         self.prevMode = mode
+    
+    def updateLockState(self, lock):
+        lockID = 1 & 0xFF
+        lockAngle = 50 & 0xFF # arbitrary
+        lockDirection = 3 & 0xFF 
+        lockState = lock & 0xFF
+        lockData = [lockID, lockAngle, lockDirection, lockState]
+        lockPacket = bytearray(lockData)
+        self.turningMechanism.push(lockPacket)
+        self.turningMechanism.send()
 
     def run(self):
         try:
