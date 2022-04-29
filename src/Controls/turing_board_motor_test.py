@@ -133,11 +133,11 @@ class Controls:
                 # time.sleep(0.1)
                 if self.autonomous_mode == False:
                     self.speed_control_mutex.acquire()
-                    self.motor.set_duty_cycle(-self.duty_cycle)
+                    self.motor.set_duty_cycle(-self.duty_cycle/10)
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
-                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.02, 300)
+                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.04, 300)
                 # print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
             print('Exiting ...')
