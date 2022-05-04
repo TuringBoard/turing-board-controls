@@ -111,6 +111,7 @@ class Controls:
             self.turningMechanism.push(LEDPacket)
             self.turningMechanism.send()
             if mode == 2:
+                # self.follow_me.updateAngle(50) Ask happy
                 self.updateLockState(0)            
             else:
                 self.updateLockState(1)
@@ -137,7 +138,7 @@ class Controls:
                     self.speed_control_mutex.release()
                 else:
                     # Call CV follow-me code here
-                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.04, 300)
+                    self.follow_me.follow_me(self.motor.set_duty_cycle, 0.035, 300)
                 # print(f" RPM: {self.motor.get_rpm():>8} Velocity = {self.__get_velocity(self.motor.get_rpm()):>8} mph\r", end="")
         except KeyboardInterrupt:
             print('Exiting ...')
